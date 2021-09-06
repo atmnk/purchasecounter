@@ -90,7 +90,38 @@ class _MyHomePageState extends State<MyHomePage> {
       'name': 'Flutter Driver Demo',
       'description': 'Counter',
       'prefill': {
-      }
+      },
+      'config': {
+        'display': {
+          'blocks': {
+            'crd': { //name for HDFC block
+              'name': "Pay using Card",
+              'instruments': [
+                {
+                  'method': "card",
+                },
+              ]
+            },
+            'other': { //  name for other block
+              'name': "Other Payment modes",
+              'instruments': [
+                {
+                  'method': 'netbanking',
+                }
+              ]
+            }
+          },
+          'hide': [
+            {
+              'method': "upi"
+            }
+          ],
+          'sequence': ["block.crd", "block.other"],
+          'preferences': {
+            'show_default_blocks': false // Should Checkout show its default blocks?
+          }
+        }
+      },
     };
     _razorpay.open(options);
 
