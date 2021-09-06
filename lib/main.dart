@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 void main() {
   enableFlutterDriverExtension();
@@ -49,16 +50,51 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  String _message ="";
 
-  void _incrementCounter() {
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
+      _message = "Payment Successful";
       _counter++;
     });
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _message = "Payment Failed";
+    });
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet was selected
+  }
+  void onPurchase() {
+    final _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+    var options = {
+      'key': 'rzp_test_hfhu2Spfpb0eVv',
+      'amount': 100,
+      'name': 'Flutter Driver Demo',
+      'description': 'Counter',
+      'prefill': {
+      }
+    };
+    _razorpay.open(options);
+
+
   }
 
   @override
@@ -96,18 +132,20 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
+              '$_message',
             ),
             Text(
               '$_counter',
+              key: new ValueKey("counter"),
               style: Theme.of(context).textTheme.headline4,
             ),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: onPurchase,
         tooltip: 'Increment',
+        key: new ValueKey("Add"),
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
